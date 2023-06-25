@@ -1,20 +1,25 @@
 # Introduction
 
-This is a pomodoro timer intended to fit on a QR code
+This is a pomodoro timer that fits in a B64 encoded qr code
 
 ## Running the program
 
-If given the binary as a binary simply run said binary
+If given the binary as a binary simply run said binary. However if given as a qr code, you first have to decode the base64 file into a binary and can run said binary.
 
 ## Compiling the program
 
-### Prerequisites
+### Prerequisites for creating the binary
 
 - make
 - nasm
 - ld
 
-To compile run `make build`
+### Prerequisites for creating the qr encode
+
+- base64
+- qrencode
+
+To compile run `make build`, while to create the qr code run `make qrcode`
 
 ## Sources
 
