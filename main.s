@@ -3,9 +3,14 @@ GLOBAL main
 
 SECTION .bss
     digitSpace resb 5
+    seconds resb 8
+    nanoseconds resb 8
 SECTION .text
 _start:
-    .startofMain
+    .setUpStart:
+        mov qword [seconds], 1
+        mov qword [nanoseconds], 0
+    .printHeaderInfo:
         push r12                ; We want to use r12 for ourself
         mov rax, 1              ; write(
         mov rdi, 1              ;   STDOUT_FILENO,
@@ -15,12 +20,10 @@ _start:
 
     ; Time to begin the timer work, Do note we shouldnt get to end
     ; r12 = time left (seconds)
-    .cycleStart
-        
-        
-    .workBegin
+    .cycleStart:
+    .workBegin:
         mov r12, 1500           ; 25 minutes * 60 seconds == 1500
-    .workLoopStart
+    .workLoopStart:
         mov rax, 1              ; write(
         mov rdi, 1              ;   STDOUT_FILENO,
         mov rsi, workmsg        ;   "Time to work, you have "",
@@ -32,17 +35,22 @@ _start:
         mov rsi, trailmsg        ;   " seconds remaining \n",
         mov rdx, trailmsglen     ;   sizeof(message)
         syscall
+        ; Now we have to sleep
+        mov rax, 35             ; Nanosleep syscall number
+        mov rdi, seconds
+        mov rsi, nanoseconds
+        syscall
         dec r12
         jge .workLoopStart
-    .workEnd
+    .workEnd:
         mov rax, 1              ; write(
         mov rdi, 1              ;   STDOUT_FILENO,
         mov rsi, beepmsg        ;   "beep",
         mov rdx, beepmsglen     ;   sizeof(message)
         syscall
-    .funBegin
+    .funBegin:
         mov r12, 300           ; 5 minutes * 60 seconds == 300
-    .funLoopStart
+    .funLoopStart:
         mov rax, 1              ; write(
         mov rdi, 1              ;   STDOUT_FILENO,
         mov rsi, breakmsg        ;   "Time to work, you have "",
@@ -54,23 +62,27 @@ _start:
         mov rsi, trailmsg        ;   " seconds remaining \n",
         mov rdx, trailmsglen     ;   sizeof(message)
         syscall
+        mov rax, 35             ; Nanosleep syscall number
+        mov rdi, seconds
+        mov rsi, nanoseconds
+        syscall
         dec r12
         jge .funLoopStart
-    .funEnd
+    .funEnd:
         mov rax, 1              ; write(
         mov rdi, 1              ;   STDOUT_FILENO,
         mov rsi, beepmsg        ;   "beep",
         mov rdx, beepmsglen     ;   sizeof(message)
         syscall
         jmp .workBegin
-    .end
+    .end:
         pop r12
         mov rax, 60       ; exit(
         mov rdi, 0        ;   EXIT_SUCCESS
         syscall           ; );
 
 printR12:
-    .printR12Start
+    .printR12Start:
     ; rdx = upper bits of dividend so first bits of x
     ; rax = lower bits of dividend so last bits of x
     ; rax = result
@@ -96,7 +108,7 @@ printR12:
         mov [digitSpace + 2], al
         mov [digitSpace + 3], dl
         mov byte [digitSpace + 4], 0
-    .printR12ActuallyPrint
+    .printR12ActuallyPrint:
         mov rax, 1              ; write(
         mov rdi, 1              ;   STDOUT_FILENO,
         mov rsi, digitSpace     ;   "{number},
