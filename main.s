@@ -1,15 +1,13 @@
 BITS 64
 GLOBAL main
 
-SECTION .bss
-    digitSpace resb 5
-    seconds resb 8
-    nanoseconds resb 8
 SECTION .text
 _start:
     .setUpStart:
-        mov qword [seconds], 1
-        mov qword [nanoseconds], 0
+        sub rsp, 16
+
+        mov qword [rsp], 1
+        mov qword [rsp + 8], 0
     .printHeaderInfo:
         push r12                ; We want to use r12 for ourself
         mov rax, 1              ; write(
@@ -37,8 +35,8 @@ _start:
         syscall
         ; Now we have to sleep
         mov rax, 35             ; Nanosleep syscall number
-        mov rdi, seconds
-        mov rsi, nanoseconds
+        lea rdi, [rsp + 8]
+        lea rsi, [rsp + 16]
         syscall
         dec r12
         jge .workLoopStart
@@ -63,8 +61,8 @@ _start:
         mov rdx, trailmsglen     ;   sizeof(message)
         syscall
         mov rax, 35             ; Nanosleep syscall number
-        mov rdi, seconds
-        mov rsi, nanoseconds
+        lea rdi, [rsp + 8]
+        lea rsi, [rsp + 16]
         syscall
         dec r12
         jge .funLoopStart
@@ -77,11 +75,14 @@ _start:
         jmp .workBegin
     .end:
         pop r12
+        add rsp, 16
         mov rax, 60       ; exit(
         mov rdi, 0        ;   EXIT_SUCCESS
         syscall           ; );
 
 printR12:
+    .printR12Prolouge:
+        sub rsp, 5
     .printR12Start:
     ; rdx = upper bits of dividend so first bits of x
     ; rax = lower bits of dividend so last bits of x
@@ -92,28 +93,29 @@ printR12:
         mov rdx, 0
         div rcx
         add rax, 48
-        mov [digitSpace], al
+        mov [rsp], al
         mov rcx, 100
         mov rax, rdx
         mov rdx, 0
         div rcx
         add rax, 48
-        mov [digitSpace + 1], al
+        mov [rsp + 1], al
         mov rcx, 10
         mov rax, rdx
         mov rdx, 0
         div rcx
         add rax, 48
         add rdx, 48
-        mov [digitSpace + 2], al
-        mov [digitSpace + 3], dl
-        mov byte [digitSpace + 4], 0
+        mov [rsp + 2], al
+        mov [rsp + 3], dl
     .printR12ActuallyPrint:
         mov rax, 1              ; write(
         mov rdi, 1              ;   STDOUT_FILENO,
-        mov rsi, digitSpace     ;   "{number},
+        mov rsi, rsp            ;   "{number},
         mov rdx, 5              ;   sizeof(message)
         syscall
+    .printR12Epilouge:
+        add rsp, 5
         ret
     
     
