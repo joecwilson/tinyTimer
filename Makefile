@@ -11,4 +11,4 @@ clean:
 qrcode: build
 	base64 tinyPomodoroTimer > b64encoded.txt
 	qrencode -o qrcode.png -8 -r b64encoded.txt
-	rm base64encoded.txt
+	rm b64encoded.txt
