@@ -4,16 +4,17 @@ GLOBAL main
 SECTION .text
 _start:
     .setUpStart:
+        push r12                ; We want to use r12 for ourself
         sub rsp, 16
 
         mov qword [rsp], 1
         mov qword [rsp + 8], 0
     .printHeaderInfo:
-        push r12                ; We want to use r12 for ourself
-        mov rax, 1              ; write(
-        mov rdi, 1              ;   STDOUT_FILENO,
+        
+        mov ax, 1              ; write(
+        mov di, 1              ;   STDOUT_FILENO,
         mov rsi, msg            ;   message,
-        mov rdx, msglen         ;   sizeof(message)
+        mov dx, msglen         ;   sizeof(message)
         syscall                 ; );
 
     ; Time to begin the timer work, Do note we shouldnt get to end
@@ -22,62 +23,62 @@ _start:
     .workBegin:
         mov r12, 1500           ; 25 minutes * 60 seconds == 1500
     .workLoopStart:
-        mov rax, 1              ; write(
-        mov rdi, 1              ;   STDOUT_FILENO,
+        mov ax, 1              ; write(
+        mov di, 1              ;   STDOUT_FILENO,
         mov rsi, workmsg        ;   "Time to work, you have "",
-        mov rdx, workmsglen     ;   sizeof(message)
+        mov dx, workmsglen     ;   sizeof(message)
         syscall
         call printR12
-        mov rax, 1              ; write(
-        mov rdi, 1              ;   STDOUT_FILENO,
+        mov ax, 1              ; write(
+        mov di, 1              ;   STDOUT_FILENO,
         mov rsi, trailmsg        ;   " seconds remaining \n",
-        mov rdx, trailmsglen     ;   sizeof(message)
+        mov dx, trailmsglen     ;   sizeof(message)
         syscall
         ; Now we have to sleep
-        mov rax, 35             ; Nanosleep syscall number
-        lea rdi, [rsp + 8]
-        lea rsi, [rsp + 16]
+        mov ax, 35             ; Nanosleep syscall number
+        lea rdi, [rsp]
+        lea rsi, [rsp + 8]
         syscall
         dec r12
         jge .workLoopStart
     .workEnd:
-        mov rax, 1              ; write(
-        mov rdi, 1              ;   STDOUT_FILENO,
+        mov ax, 1              ; write(
+        mov di, 1              ;   STDOUT_FILENO,
         mov rsi, beepmsg        ;   "beep",
-        mov rdx, beepmsglen     ;   sizeof(message)
+        mov dx, beepmsglen     ;   sizeof(message)
         syscall
     .funBegin:
         mov r12, 300           ; 5 minutes * 60 seconds == 300
     .funLoopStart:
-        mov rax, 1              ; write(
-        mov rdi, 1              ;   STDOUT_FILENO,
+        mov ax, 1              ; write(
+        mov di, 1              ;   STDOUT_FILENO,
         mov rsi, breakmsg        ;   "Time to work, you have "",
-        mov rdx, breakmsglen     ;   sizeof(message)
+        mov dx, breakmsglen     ;   sizeof(message)
         syscall
         call printR12
-        mov rax, 1              ; write(
-        mov rdi, 1              ;   STDOUT_FILENO,
+        mov ax, 1              ; write(
+        mov di, 1              ;   STDOUT_FILENO,
         mov rsi, trailmsg        ;   " seconds remaining \n",
-        mov rdx, trailmsglen     ;   sizeof(message)
+        mov dx, trailmsglen     ;   sizeof(message)
         syscall
         mov rax, 35             ; Nanosleep syscall number
-        lea rdi, [rsp + 8]
-        lea rsi, [rsp + 16]
+        lea rdi, [rsp]
+        lea rsi, [rsp + 8]
         syscall
         dec r12
         jge .funLoopStart
     .funEnd:
-        mov rax, 1              ; write(
-        mov rdi, 1              ;   STDOUT_FILENO,
+        mov ax, 1              ; write(
+        mov di, 1              ;   STDOUT_FILENO,
         mov rsi, beepmsg        ;   "beep",
-        mov rdx, beepmsglen     ;   sizeof(message)
+        mov dx, beepmsglen     ;   sizeof(message)
         syscall
         jmp .workBegin
     .end:
         pop r12
         add rsp, 16
-        mov rax, 60       ; exit(
-        mov rdi, 0        ;   EXIT_SUCCESS
+        mov ax, 60       ; exit(
+        mov di, 0        ;   EXIT_SUCCESS
         syscall           ; );
 
 printR12:
