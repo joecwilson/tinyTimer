@@ -7,8 +7,8 @@ _start:
         push r12                ; We want to use r12 for ourself
         sub rsp, 16
 
-        mov qword [rsp], 1
-        mov qword [rsp + 8], 0
+        mov word [rsp], 1
+        mov word [rsp + 8], 0
     .printHeaderInfo:
         
         mov ax, 1              ; write(
@@ -74,39 +74,33 @@ _start:
         mov dx, beepmsglen     ;   sizeof(message)
         syscall
         jmp .workBegin
-    .end:
-        pop r12
-        add rsp, 16
-        mov ax, 60       ; exit(
-        mov di, 0        ;   EXIT_SUCCESS
-        syscall           ; );
 
 printR12:
     .printR12Prolouge:
         sub rsp, 5
     .printR12Start:
-    ; rdx = upper bits of dividend so first bits of x
-    ; rax = lower bits of dividend so last bits of x
-    ; rax = result
-    ; rdx = remainder
-        mov rcx, 1000
+    ; dx = upper bits of dividend so first bits of x
+    ; ax = lower bits of dividend so last bits of x
+    ; ax = result
+    ; dx = remainder
+        mov cx, 1000
         mov rax, r12
-        mov rdx, 0
-        div rcx
-        add rax, 48
+        mov dx, 0
+        div cx
+        add ax, 48
         mov [rsp], al
-        mov rcx, 100
-        mov rax, rdx
-        mov rdx, 0
-        div rcx
-        add rax, 48
+        mov cx, 100
+        mov ax, dx
+        mov dx, 0
+        div cx
+        add ax, 48
         mov [rsp + 1], al
-        mov rcx, 10
-        mov rax, rdx
-        mov rdx, 0
-        div rcx
-        add rax, 48
-        add rdx, 48
+        mov cx, 10
+        mov ax, dx
+        mov dx, 0
+        div cx
+        add ax, 48
+        add dx, 48
         mov [rsp + 2], al
         mov [rsp + 3], dl
     .printR12ActuallyPrint:
