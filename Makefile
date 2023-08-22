@@ -4,6 +4,13 @@ build:
 	rm main.o
 
 
+debug:
+	nasm -f elf64 -o main.o -g main.s
+	ld  -o debug_timer main.o -n
+	rm main.o
+	# gdb ./debug_timer
+
+
 clean:
 	rm tinyPomodoroTimer
 	rm qrcode.png
