@@ -24,8 +24,8 @@ _start:
         mov r12, 1500           ; 25 minutes * 60 seconds == 1500
     .workLoopStart:
         mov ax, 1              ; write(
-        mov di, 1              ;   STDOUT_FILENO,
-        mov rsi, workmsg        ;   "Time to work, you have "",
+        mov rdi, 1              ;   STDOUT_FILENO,
+        mov rsi, workmsg        ;   "Time to work, you have "
         mov dx, workmsglen     ;   sizeof(message)
         syscall
         call printR12
@@ -43,7 +43,7 @@ _start:
         jge .workLoopStart
     .workEnd:
         mov ax, 1              ; write(
-        mov di, 1              ;   STDOUT_FILENO,
+        mov rdi, 1              ;   STDOUT_FILENO,
         mov rsi, beepmsg        ;   "beep",
         mov dx, beepmsglen     ;   sizeof(message)
         syscall
@@ -51,7 +51,7 @@ _start:
         mov r12, 300           ; 5 minutes * 60 seconds == 300
     .funLoopStart:
         mov ax, 1              ; write(
-        mov di, 1              ;   STDOUT_FILENO,
+        mov rdi, 1              ;   STDOUT_FILENO,
         mov rsi, breakmsg        ;   "Time to work, you have "",
         mov dx, breakmsglen     ;   sizeof(message)
         syscall
@@ -69,7 +69,7 @@ _start:
         jge .funLoopStart
     .funEnd:
         mov ax, 1              ; write(
-        mov di, 1              ;   STDOUT_FILENO,
+        mov rdi, 1              ;   STDOUT_FILENO,
         mov rsi, beepmsg        ;   "beep",
         mov dx, beepmsglen     ;   sizeof(message)
         syscall
@@ -116,13 +116,13 @@ printR12:
     
 
 section .rodata
-    workmsg: db "Time to work, you have "
+    workmsg: db 13, "Time to work, you have "
     workmsglen: equ $ - workmsg
-    breakmsg: db "Time to relax, you have "
+    breakmsg: db 13, "Time to relax, you have "
     breakmsglen: equ $ - breakmsg
-    trailmsg: db " seconds remaining.", 10
+    trailmsg: db " seconds remaining. "
     trailmsglen: equ $ - trailmsg
     msg: db "MIT Licenced, see https://github.com/joecwilson/tinyTimer for details.", 10
     msglen: equ $ - msg
-    beepmsg: db "Finished a cylcle, Notifing", 7, 10
+    beepmsg: db 13 ,"Finished a cylcle, Notifing", 7
     beepmsglen: equ $ - beepmsg
