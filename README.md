@@ -2,6 +2,8 @@
 
 This is a pomodoro timer that fits in a B64 encoded qr code
 
+![image The QR code](qrcode.png)
+
 ## Running the program
 
 If given the binary as a binary simply run said binary. However if given as a qr code, you first have to decode the base64 file into a binary and can run said binary.
